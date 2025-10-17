@@ -1,0 +1,17 @@
+services:
+  
+  # Servicio del Backend
+  backend:
+    build: ./backend
+    container_name: pjn-backend
+    ports:
+      - "3001:3001"
+  
+  # Servicio del Frontend
+  frontend:
+    build: ./frontend
+    container_name: pjn-frontend
+    ports:
+      - "5173:80" 
+
+  
