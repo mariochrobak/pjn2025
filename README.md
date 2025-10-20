@@ -53,4 +53,4 @@ synchronize: false,  // ¡No usar en producción!
 ```
 
 #### Acceso la aplicación
-Una vez que estén en ejecución el backend y el frontend, se accede a la aplicación desde el navegador en le [URL](http://localhost:5173)) - ``http://localhost:5173``
+Una vez que estén en ejecución el backend y el frontend, se accede a la aplicación desde el navegador en le [URL](http://localhost:5173) - ``http://localhost:5173``
