@@ -79,9 +79,9 @@ export const deleteEmpleado = async (req: Request, res: Response) => {
         
         const countHistorial = await historialRepo.count({ where: { empleado: { id } } });
         if (countHistorial > 0) {
-        return res.status(400).json({ message: 'No se puede eliminar el empleado porque tiene historial de traslados.' });
+          return res.status(400).json({ message: 'No se puede eliminar el empleado porque tiene historial de traslados.' });
         }
-        
+        await empleadoRepo.remove(empleado);
 
         // Opción 2: Eliminar al empleado y todos su historial de traslados
         /*

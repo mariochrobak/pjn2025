@@ -51,3 +51,6 @@ synchronize: true,  // ¡No usar en producción!
 database: './src/pjn.db', // Se adjunta base con datos de prueba para el modo de desarrollo
 synchronize: false,  // ¡No usar en producción!
 ```
+
+#### Acceso la aplicación
+Una vez que estén en ejecución el backend y el frontend, se accede a la aplicación desde el navegador en la [URL](http://localhost:5173) - ``http://localhost:5173``

@@ -98,7 +98,7 @@ const showEditCreateModal = (empleado?: Empleado) => {
       handleCancel();
       loadInitialData();
     } catch (error: any) {
-      message.error(editingEmpleado ? 'Error al actualizar el empleado' : 'Error al crear el empleado');
+      message.error(editingEmpleado ? 'Error al actualizar el empleado' : 'Error al crear el empleado' );
     } finally {
       setIsSubmitting(false);
     }
