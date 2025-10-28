@@ -1,155 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Table, Button, Modal, Select, message, Form, Input, Space, Tooltip, Divider } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { ArrowRightOutlined, EditOutlined, DeleteOutlined, PlusOutlined, SaveOutlined, HistoryOutlined} from '@ant-design/icons';
-import { getEmpleados, moverEmpleado, createEmpleado, type NewEmpleado, getDependencias, deleteEmpleado, updateEmpleado } from '../services/api';
-import { type Empleado, type Dependencia } from '../types/types';
+import React from 'react';
+import { Table, Button, Modal, Select, Form, Input, Tooltip, Divider } from 'antd';
+import { PlusOutlined, SaveOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { useEmpleados } from '../hooks/useEmpleados';
+import { getEmpleadosColumns } from '../components/columnasEmpleados';
 
 const { Option } = Select;
 
-
-
 export const PaginaEmpleados: React.FC = () => {
-  const [empleados, setEmpleados] = useState<Empleado[]>([]);
-  const [dependencias, setDependencias] = useState<Dependencia[]>([]);
-  const [isMoveModalVisible, setIsMoveModalVisible] = useState(false);
-  const [selectedEmpleado, setSelectedEmpleado] = useState<Empleado | null>(null);
-  const [targetDependencia, setTargetDependencia] = useState<number | null>(null);
-  const [isEditCreateModalVisible, setIsEditCreateModalVisible] = useState(false);
-  const [editingEmpleado, setEditingEmpleado] = useState<Empleado | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [form] = Form.useForm();
+    const {
+        empleados, dependencias, isMoveModalVisible, selectedEmpleado, targetDependencia,
+        isEditCreateModalVisible, editingEmpleado, isSubmitting, form,
+        handleMoveClick, handleOkMove, setIsMoveModalVisible, setTargetDependencia,
+        showEditCreateModal, handleCancel, handleFinish, handleDelete
+    } = useEmpleados();
 
-  const loadInitialData = async () => {
-    try {
-      const [empleadosResponse, dependenciasResponse] = await Promise.all([
-        getEmpleados(),
-        getDependencias()
-      ]);
-      setEmpleados(empleadosResponse.data);
-      setDependencias(dependenciasResponse.data);
-    } catch (error: any) {
-      message.error('Error al cargar los datos iniciales');
-    }
-  };
+    const columns = getEmpleadosColumns({ handleMoveClick, showEditCreateModal, handleDelete });
 
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  const handleMoveClick = (empleado: Empleado) => {
-    setSelectedEmpleado(empleado);
-    setTargetDependencia(empleado.dependencia?.id || null)
-    setIsMoveModalVisible(true);
-  };
-
-  const handleOkMove = async () => {
-    if (!selectedEmpleado || !targetDependencia) return;
-    setIsSubmitting(true);
-    try {
-      await moverEmpleado(selectedEmpleado.id, { dependenciaDestinoId: targetDependencia });
-      message.success(`Empleado ${selectedEmpleado.nombre} ${selectedEmpleado.apellido} movido exitosamente.`);      
-      loadInitialData();
-    } catch (error: any) {
-      message.error('No se pudo mover al empleado.');
-    } finally {
-      setIsMoveModalVisible(false);      
-      setIsSubmitting(false);
-      setSelectedEmpleado(null);
-      setTargetDependencia(null);      
-    }
-  };
-
-const showEditCreateModal = (empleado?: Empleado) => {
-    if (empleado) {      
-      setEditingEmpleado(empleado);
-      form.setFieldsValue({
-        legajo: empleado.legajo,
-        nombre: empleado.nombre,
-        apellido: empleado.apellido,
-        dni: empleado.dni,
-        dependencia_id: empleado.dependencia?.id,
-      });
-    } else {      
-      setEditingEmpleado(null);
-      form.resetFields();
-    }
-    setIsEditCreateModalVisible(true);
-  };
-  
-  const handleCancel = () => {
-    setIsEditCreateModalVisible(false);
-    setEditingEmpleado(null);
-    form.resetFields();
-  };
-  
-
-  const handleFinish = async (values: NewEmpleado) => {
-    setIsSubmitting(true);
-    try {
-      if (editingEmpleado) {
-        await updateEmpleado(editingEmpleado.id, values);
-        message.success('Empleado actualizado exitosamente');
-      } else {        
-        await createEmpleado(values);
-        message.success('Empleado creado exitosamente');
-      }
-      handleCancel();
-      loadInitialData();
-    } catch (error: any) {
-      message.error(editingEmpleado ? 'Error al actualizar el empleado' : 'Error al crear el empleado' );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDelete = (id: number) => {
-    Modal.confirm({
-      title: '¿Confirma que desea eliminar este empleado?',
-      content: 'Esta acción no se puede deshacer.',
-      okText: 'Sí, eliminar',
-      okType: 'danger',
-      cancelText: 'No',
-      onOk: async () => {
-        try {
-          await deleteEmpleado(id);
-          message.success('Empleado eliminado exitosamente!!');
-          loadInitialData();
-        } catch (error: any) {
-          const errorMessage = error.response?.data?.message || 'Error al eliminar el empleado';
-          message.error(errorMessage);
-        }
-      },
-    });
-  };
-
-  const columns: ColumnsType<Empleado> = [
-      {title: 'Legajo', dataIndex: 'legajo', key: 'legajo', sorter: (a: Empleado, b: Empleado) => {const legajoA = parseInt(a.legajo, 10) || 0; const legajoB = parseInt(b.legajo, 10) || 0; return legajoA - legajoB;}, defaultSortOrder: 'ascend'},
-      {title: 'Nombre', dataIndex: 'nombre', key: 'nombre', sorter: (a: Empleado, b: Empleado) => a.nombre.localeCompare(b.nombre)},
-      {title: 'Apellido', dataIndex: 'apellido', key: 'apellido', sorter: (a: Empleado, b: Empleado) => a.apellido.localeCompare(b.apellido)},
-      {title: 'DNI', dataIndex: 'dni', key: 'dni', sorter: (a: Empleado, b: Empleado) => {const dniA = parseInt(a.dni, 10) || 0; const dniB = parseInt(b.dni, 10) || 0; return dniA - dniB;}},
-      {title: 'Dependencia', dataIndex: ['dependencia', 'nombre'], key: 'dependencia', sorter: (a: Empleado, b: Empleado) => (a.dependencia?.nombre || '').localeCompare(b.dependencia?.nombre || '')},
-      {title: 'Edificio', dataIndex: ['dependencia', 'edificio', 'nombre'], key: 'edificio', sorter: (a: Empleado, b: Empleado) => (a.dependencia?.edificio?.nombre || '').localeCompare(b.dependencia?.edificio?.nombre || '')},
-      {
-        title: 'Acciones',
-        key: 'acciones',
-        render: (_: any, record: Empleado) => (
-          <Space size="small">
-            <Button title="Trasladar" type="primary" icon={<ArrowRightOutlined />} onClick={() => handleMoveClick(record)}/>
-            <Button title="Editar" type="primary" icon={<EditOutlined />} onClick={() =>showEditCreateModal(record)}/>
-            <Button title="Eliminar" type="primary" danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)}/>
-            <Link to={`/empleados/${record.id}/historial`}>
-              <Button title="Historial de traslados" type="primary"  icon={<HistoryOutlined />} style={{backgroundColor: '#faad14'}}/>
-            </Link>
-          </Space>
-        ),
-      },
-    ];
-
-  return (
-    <>
-
+    return (
+        <>
 
       <Tooltip title="Agregar empleado" color="blue" placement="right">
         <Button type="primary" icon={<PlusOutlined/>} onClick={() => showEditCreateModal()} style={{ marginBottom: 16 }}/>
@@ -223,5 +91,6 @@ const showEditCreateModal = (empleado?: Empleado) => {
         </Form>
       </Modal>
     </>
-  );
+
+    );
 };

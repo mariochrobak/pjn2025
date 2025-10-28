@@ -7,8 +7,8 @@ import { HistorialTraslados } from './entities/HistorialTraslados';
 
 export const AppDataSource = new DataSource({
     type: 'sqlite',
-    database: ':memory:',  
-    //database: './src/pjn.db', // Se adjunta base con datos de prueba para el modo de desarrollo
+    //database: ':memory:',  
+    database: './src/pjn.db', // Se adjunta base con datos de prueba para el modo de desarrollo
     synchronize: true,  // ¡No usar en producción!
     logging: false,
     entities: [Empleado, Dependencia, Edificio, HistorialTraslados], 
