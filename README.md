@@ -42,14 +42,14 @@ En dichas imágenes se ha incluido una base de datos con información de muestra
 ```js
 database: ':memory:',  
 //database: './src/pjn.db', // Se adjunta base con datos de prueba para el modo de desarrollo
-synchronize: true,  // ¡No usar en producción!
+synchronize: true,  // ¡Inicializa base de datos!
 ```
 
 ``Para activar la base de datos incluída``
 ```js
 //database: ':memory:',  
 database: './src/pjn.db', // Se adjunta base con datos de prueba para el modo de desarrollo
-synchronize: false,  // ¡No usar en producción!
+synchronize: false,
 ```
 
 #### Acceso la aplicación
