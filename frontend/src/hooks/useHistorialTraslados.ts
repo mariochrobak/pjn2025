@@ -33,4 +33,8 @@ export const useHistorialTraslados = () => {
         };
 
         fetchData();
-    },
+    }, [empleadoId]); // El efecto se vuelve a ejecutar si el ID del empleado cambia
+
+    // Devolvemos todo lo que la vista necesita para renderizarse
+    return { historial, empleado, loading };
+};

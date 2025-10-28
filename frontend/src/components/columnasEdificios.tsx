@@ -1,6 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Space, Tooltip } from 'antd';
+import { Button, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { EditOutlined, DeleteOutlined, TeamOutlined } from '@ant-design/icons';
 import type { Edificio } from '../types/types';
